@@ -16,20 +16,25 @@ class Document(db.Model):
     size = db.Column(db.BigInteger, nullable=False, default=0)
 
     # relation fields
-    meta = db.relationship("DocumentMeta", uselist=False, back_populates="document", lazy='select')
-    hashes = db.relationship("DocumentHash", back_populates='document')
+    meta = db.relationship(
+        "DocumentMeta", uselist=False, back_populates="document", lazy="select"
+    )
+    hashes = db.relationship("DocumentHash", back_populates="document")
 
     def __repr__(self):
         return "<Document '{}'>".format(self.name)
 
 
 class DocumentHash(db.Model):
-    ''' Model for store document's hashes '''
-    __tablename__ = 'document_hash'
+    """ Model for store document's hashes """
+
+    __tablename__ = "document_hash"
 
     # table fields
     uuid = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    document_uuid = db.Column(UUID(as_uuid=True), db.ForeignKey('document.uuid'), nullable=False)
+    document_uuid = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("document.uuid"), nullable=False
+    )
     name = db.Column(db.String(10), nullable=False)
     value = db.Column(db.String(64), nullable=False, unique=True)
 
@@ -38,15 +43,18 @@ class DocumentHash(db.Model):
 
 
 class DocumentMeta(db.Model):
-    ''' Model for store ducment's meta information '''
-    __tablename__ = 'document_meta'
+    """ Model for store ducment's meta information """
+
+    __tablename__ = "document_meta"
 
     # table fields
-    uuid = db.Column(UUID(as_uuid=True), db.ForeignKey('document.uuid'), primary_key=True)
+    uuid = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("document.uuid"), primary_key=True
+    )
     time_of_creation = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    creator = db.Column(db.String(100), nullable=False, default='Anonymouse')
+    creator = db.Column(db.String(100), nullable=False, default="Anonymouse")
     word_count = db.Column(db.Integer, nullable=False, default=0)
-    language = db.Column(db.String(10), nullable=False, default='Unknown')
+    language = db.Column(db.String(10), nullable=False, default="Unknown")
 
     # relation fields
     document = db.relationship("Document", back_populates="meta")
