@@ -26,6 +26,7 @@ def hash_document(
 
     return result
 
+
 def add_document(name: str, data: bytes):
     ''' Add document '''
     # hash document and check for document collision
@@ -50,6 +51,7 @@ def add_document(name: str, data: bytes):
     db.session.add(create_document_meta(document))
     db.session.commit()
     return document
+
 
 def create_document(
     name: str,
@@ -77,6 +79,7 @@ def create_document_hashes(document: Document, document_hashes: Dict[str, str]=N
             value=hash_value
         ) for hash_function, hash_value in document_hashes.items()
     ]
+
 
 def create_document_meta(document: Document):
     ''' Get metadata from apache tika '''
@@ -109,6 +112,7 @@ def list_documents(start=0, offset=0):
         .options(defer('data'))
         .all()
     )
+
 
 def get_document(uuid: uuid.UUID):
     return Document.query.filter_by(uuid=uuid).first()
