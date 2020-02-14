@@ -1,12 +1,12 @@
 ##DockerFile
 #Pulling base python image from dockerhub
-FROM python:3-alpine
+FROM python:3
 # Create app directory as working directory
-WORKDIR /opt/doc_api
+WORKDIR /app
 # Copy code from root repo to the working directory
-COPY . /opt/doc_api
+COPY . /app
 #Run python commands to build and serve the application
-RUN pip install /opt/doc_api && rm -rf /opt/doc_api
+RUN pip3 install -r /app/requirements.txt
 #Copying nginx conf file to nginx configuration path
 #Giving executable permission
-CMD [“/usr/bin/python3.6”]
+CMD ["python", "manage.py", "run"]

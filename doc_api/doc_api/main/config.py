@@ -14,14 +14,14 @@ class DevelopmentConfig(Config):
     # uncomment the line below to use postgres
     # SQLALCHEMY_DATABASE_URI = postgres_local_base
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "postgres://postgres:password@127.0.0.1:5432/dev"
+    SQLALCHEMY_DATABASE_URI = "postgres://postgres:password@intelligent_lovelace/dev"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class TestingConfig(Config):
     DEBUG = True
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgres://postgres:password@127.0.0.1:5432/test"
+    SQLALCHEMY_DATABASE_URI = "postgres://postgres:password@intelligent_lovelace/test"
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -29,7 +29,7 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DOCAPI_DATABASE_URI", "postgres://postgres:password@127.0.0.1:5432/postgres"
+        "DOCAPI_DATABASE_URI", "postgres://postgres:password@intelligent_lovelace/postgres"
     )
 
 
