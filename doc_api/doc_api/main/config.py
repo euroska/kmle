@@ -1,12 +1,13 @@
 import os
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
     SECRET_KEY = os.getenv("DOCAPI_SECRET_KEY", "secret_key")
-    HASH_FUNCTIONS = ["sha256", "sha1", "md5"]
+    HASH_FUNCTIONS = {"sha256", "sha1", "md5"}
+    ALLOWED_EXTENSION = {"docx", "pdf"}
 
 
 class DevelopmentConfig(Config):
@@ -32,6 +33,5 @@ class ProductionConfig(Config):
     )
 
 
-config_by_name = dict(dev=DevelopmentConfig, test=TestingConfig, prod=ProductionConfig)
-
-key = Config.SECRET_KEY
+CONFIG_BY_NAME = dict(dev=DevelopmentConfig, test=TestingConfig, prod=ProductionConfig)
+KEY = Config.SECRET_KEY

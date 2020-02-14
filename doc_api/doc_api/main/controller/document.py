@@ -1,26 +1,26 @@
-from flask import request, make_response
+from io import BytesIO
+from flask import request, send_file
 from flask_restx import Resource
 
 from ..dto.document import DocumentDTO
-from ..service.document import *
+from ..service.document import get_document, list_documents, add_document
 
-api = DocumentDTO.api
+api = DocumentDTO.api  # pylint: disable=invalid-name
 
 
 @api.route("/")
+@api.header('Access-Control-Allow-Origin', '*')
 class DocumentList(Resource):
     @api.doc("List of uploaded document")
     @api.marshal_with(DocumentDTO.document, code=200)
-    def get(self):
+    def get(self):  # pylint: disable=no-self-use
         """ List all documents """
-        documents = [document for document in list_documents()]
-        print(documents)
-        return documents
+        return list_documents()
 
     @api.doc("Create a new document")
     @api.marshal_with(DocumentDTO.document, code=201)
     @api.expect(DocumentDTO.upload, validate=True)
-    def post(self):
+    def post(self):  # pylint: disable=no-self-use
         """ Creates a new Document """
         document = request.files["document"]
         return add_document(document.filename, document.stream.read())
@@ -29,17 +29,20 @@ class DocumentList(Resource):
 @api.route("/<uuid:uuid>")
 @api.param("uuid", "The Document identifier")
 @api.response(404, "Document not found.")
+@api.header('Access-Control-Allow-Origin', '*')
 class Document(Resource):
     @api.doc("Get a document")
     @api.response(200, "Document octet stream.")
     @api.produces(["application/octet-stream"])
-    def get(self, uuid):
+    def get(self, uuid):  # pylint: disable=no-self-use
         """ Get a document given its identifier """
         document = get_document(uuid)
         if not document:
             api.abort(404)
 
-        else:
-            response = make_response(document.data, 200)
-            response.mimetype = "application/octet-stream"
-            return response
+        return send_file(
+            BytesIO(document.data),
+            mimetype="application/octet-stream",
+            as_attachment=True,
+            attachment_filename=document.name,
+        )

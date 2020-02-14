@@ -1,8 +1,6 @@
 import uuid
-import datetime
 import hashlib
 import requests
-import time
 
 from typing import List, Dict
 from dateutil.parser import parse as parse_datetime
@@ -30,9 +28,11 @@ def add_document(name: str, data: bytes):
     document_hashes = hash_document(data)
 
     for hash_function, hash_data in document_hashes.items():
-        if document_hash := DocumentHash.query.filter_by(
+        document_hash = DocumentHash.query.filter_by(
             name=hash_function, value=hash_data
-        ).first():
+        ).first()
+
+        if document_hash:
             return document_hash.document
 
     # create document
@@ -75,12 +75,12 @@ def create_document_hashes(document: Document, document_hashes: Dict[str, str] =
 def create_document_meta(document: Document):
     """ Get metadata from apache tika """
     request = requests.put(
-        "http://172.17.0.7:9998/meta",
+        "http://172.17.0.7:9998/meta",  # TODO: Hardcoded
         data=document.data,
-        headers={"Accept": "application/json",},
+        headers={"Accept": "application/json"}
     )
     response_json = request.json()
-    print(response_json)
+
     return DocumentMeta(
         uuid=document.uuid,
         time_of_creation=(
@@ -89,7 +89,15 @@ def create_document_meta(document: Document):
             else None
         ),
         creator=response_json.get("Author"),
-        word_count=response_json.get("meta:word-count"),
+        word_count=response_json.get(
+            "meta:word-count",
+            len(
+                requests.put(
+                    "http://172.17.0.7:9998/tika",  # TODO: Hardcoded
+                    data=document.data,
+                ).text.split()
+            )
+        ),
         language=response_json.get("language"),
     )
 

@@ -1,12 +1,8 @@
-import os
 import unittest
-import hashlib
 import uuid
 
-from flask import current_app
 from flask_testing import TestCase
 from doc_api.main import db
-from doc_api.main.config import basedir
 from doc_api.main.model.document import Document
 from doc_api.main.service.document import hash_document, add_document
 from manage import app

@@ -4,3 +4,4 @@ __pycache__
 *.kdev4
 *.egg-info
 *.kate-swp
+node_modules

@@ -3,9 +3,9 @@ from flask import Blueprint
 
 from .main.controller.document import api as document_ns
 
-blueprint = Blueprint("api", __name__)
+blueprint = Blueprint("api", __name__)  # pylint: disable=invalid-name
 
-api = Api(
+api = Api(  # pylint: disable=invalid-name
     blueprint,
     title="DOCUMENT STORAGE",
     version="1.0",
