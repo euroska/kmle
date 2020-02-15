@@ -14,10 +14,6 @@ class TestDevelopmentConfig(TestCase):
         self.assertFalse(app.config["SECRET_KEY"] == "secret_key")
         self.assertTrue(app.config["DEBUG"] is True)
         self.assertFalse(current_app is None)
-        self.assertTrue(
-            app.config["SQLALCHEMY_DATABASE_URI"]
-            == "postgres://postgres:password@127.0.0.1:5432/dev"
-        )
 
 
 class TestTestingConfig(TestCase):
@@ -28,10 +24,6 @@ class TestTestingConfig(TestCase):
     def test_app_is_testing(self):
         self.assertFalse(app.config["SECRET_KEY"] == "secret_key")
         self.assertTrue(app.config["DEBUG"])
-        self.assertTrue(
-            app.config["SQLALCHEMY_DATABASE_URI"]
-            == "postgres://postgres:password@127.0.0.1:5432/test"
-        )
 
 
 class TestProductionConfig(TestCase):

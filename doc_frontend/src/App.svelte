@@ -17,7 +17,7 @@
 
     onMount(async () => {
         const response = await fetch(
-            `${doc_api}/v1/document/`,
+            `${doc_api}/api/v1/document/`,
             { method: 'get', mode: "cors" }
         );
         const documentListResponse = await response.json();
@@ -37,7 +37,7 @@
         for(let file of input.files) {
             let data = new FormData()
             data.append('document', file)
-            fetch(`${doc_api}/v1/document/`, {
+            fetch(`${doc_api}/api/v1/document/`, {
                 method: 'POST',
                 body: data
             })
@@ -66,7 +66,7 @@
         {#if documentList}
             {#each documentList as document, i}
                 <Row class="{bg[i%2 + document.new]}">
-                    <Col xs="4"><a href="{doc_api}/v1/document/{document.uuid}">{document.name}</a></Col>
+                    <Col xs="4"><a href="{doc_api}/api/v1/document/{document.uuid}">{document.name}</a></Col>
                     <Col xs="2">{formatDate(document.meta.timeOfCreation, '#{Y}/#{m}/#{d}')}</Col>
                     <Col xs="2">{document.meta.creator}</Col>
                     <Col xs="2">{document.meta.wordCount}</Col>

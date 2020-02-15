@@ -75,7 +75,7 @@ def create_document_hashes(document: Document, document_hashes: Dict[str, str] =
 def create_document_meta(document: Document):
     """ Get metadata from apache tika """
     request = requests.put(
-        "http://172.17.0.7:9998/meta",  # TODO: Hardcoded
+        f"{app.config['TIKA_SERVER']}/meta",
         data=document.data,
         headers={"Accept": "application/json"}
     )
@@ -93,7 +93,7 @@ def create_document_meta(document: Document):
             "meta:word-count",
             len(
                 requests.put(
-                    "http://172.17.0.7:9998/tika",  # TODO: Hardcoded
+                    f"{app.config['TIKA_SERVER']}/tika",
                     data=document.data,
                 ).text.split()
             )

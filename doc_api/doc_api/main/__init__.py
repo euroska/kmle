@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_uuid import FlaskUUID
@@ -8,7 +9,7 @@ db = SQLAlchemy()  # pylint: disable=invalid-name
 uuid = FlaskUUID()  # pylint: disable=invalid-name
 
 
-def create_app(config_name):
+def create_app(config_name=os.getenv('DOCAPI_ENV', 'dev')):
     app = Flask(__name__)
     app.config.from_object(CONFIG_BY_NAME[config_name])
     db.init_app(app)
