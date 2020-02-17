@@ -1,21 +1,55 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
   name: docapi
   labels:
-    app: tika
+    app: docapi
+
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: tika
-  template:
-    metadata:
-      labels:
-        app: tika
-    spec:
-      containers:
-      - name: tika
-        image: logicalspark/docker-tikaserver
-        ports:
-        - containerPort: 9998
+  containers:
+  - name: docapi-postgres
+    image: postgres:10-alpine
+    env:
+    - name: POSTGRES_PASSWORD
+      value: password
+    volumeMounts:
+    - mountPath: /var/lib/postgresql/data
+      name: databse
+
+  - name: docapi-tika
+    image: logicalspark/docker-tikaserver
+
+  - name: docapi-nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+
+    volumeMounts:
+    - mountPath: /etc/nginx/conf.d
+      name: nginx-config
+    - mountPath: /var/www
+      name: nginx-frontend
+
+  - name: docapi-backend
+    image: euroska/test
+    env:
+    - name: DOCAPI_TIKA_URL
+      value: http://docapi-tika:9998
+    - name: DOCAPI_DEV_DB
+      value: postgres://postgres:password@$(DATABASE_DOCKER_NAME)/dev
+
+  volumes:
+    - name: databse
+      hostPath:
+        path: /home/euro/Projects/kmle/storage/database
+        type: Directory
+
+    - name: nginx-config
+      hostPath:
+        path: /home/euro/Projects/kmle/storage/nginx
+        type: Directory
+
+    - name: nginx-frontend
+      hostPath:
+        path: /home/euro/Projects/kmle/storage/frontend
+        type: Directory

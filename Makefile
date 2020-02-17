@@ -2,7 +2,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 DATABASE_DOCKER_NAME="docapi-postgres"
 TIKA_DOCKER_NAME="docapi-tika"
-BACKEND_DOCKER_NAME="docapi-backend"
+BACKEND_DOCKER_NAME="euroska/test"
 FRONTEND_DOCKER_NAME="docapi-frontend"
 NGINX_DOCKER_NAME="docapi-nginx"
 
@@ -37,11 +37,18 @@ postgres_pull_image:
 postgres_database: postgres_pull_image
 	docker run -it --rm --name $(DATABASE_DOCKER_NAME)\
 		-v $(ROOT_DIR)/storage/database:/var/lib/postgresql/data \
-		-e POSTGRES_PASSWORD=password\
+		-e POSTGRES_PASSWORD=password -p 5432:5432 \
 		postgres:10-alpine
 
+postgres_database_create: postgres_pull_image
+	docker run -it --rm --name $(DATABASE_DOCKER_NAME)\
+		-v $(ROOT_DIR)/storage/database:/var/lib/postgresql/data \
+		-e POSTGRES_PASSWORD=password -p 5432:5432 \
+		postgres:10-alpine
+		psql -c "CREATE DATABASE dev; CREATE DATABASE test; CREATE DATABASE prod";
+
 backend_build_image:
-	docker build -t doc_api/backend $(ROOT_DIR)/doc_api/
+	docker build -t $(BACKEND_DOCKER_NAME) $(ROOT_DIR)/doc_api/
 
 backend_run_dev_image:
 	docker run -it --rm  --name $(BACKEND_DOCKER_NAME) -p 5000:5000 \
@@ -55,16 +62,17 @@ backend_run_dev_image:
 backend_run_test_image:
 	docker run -it --rm  --name $(BACKEND_DOCKER_NAME) -p 5000:5000 \
 		--link $(DATABASE_DOCKER_NAME):$(DATABASE_DOCKER_NAME) \
-		-w /app doc_api/backend /bin/bash -c \
+		doc_api/backend /bin/bash -c \
 		"python manage.py test && python manage run"
 
 nginx_pull_image:
-	docker pull matriphe/alpine-nginx
+	docker pull nginx
 
-nginx_run:
+nginx_run: # nginx_pull_image
 	docker run -it --rm --name $(NGINX_DOCKER_NAME) -p 8080:80 \
 	--link $(BACKEND_DOCKER_NAME):$(BACKEND_DOCKER_NAME) \
 	-v $(ROOT_DIR)/storage/nginx:/etc/nginx/conf.d \
 	-v $(ROOT_DIR)/storage/frontend/:/var/www \
+	-v /tmp/client_body/:/var/lib/nginx/tmp/client_body/ \
 	-v /tmp:/var/log/nginx \
-	matriphe/alpine-nginx
+	nginx

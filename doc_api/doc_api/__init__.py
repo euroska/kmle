@@ -12,4 +12,4 @@ api = Api(  # pylint: disable=invalid-name
     description="Document semantic storage",
 )
 
-api.add_namespace(document_ns, path="/document")
+api.add_namespace(document_ns, path="/api/v1/document")
