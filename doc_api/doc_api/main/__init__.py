@@ -9,7 +9,8 @@ db = SQLAlchemy()  # pylint: disable=invalid-name
 uuid = FlaskUUID()  # pylint: disable=invalid-name
 
 
-def create_app(config_name=os.getenv('DOCAPI_ENV', 'dev')):
+def create_app(config_name=os.getenv("DOCAPI_ENV", "dev")):
+    print("create app", config_name)
     app = Flask(__name__)
     app.config.from_object(CONFIG_BY_NAME[config_name])
     db.init_app(app)
@@ -17,6 +18,7 @@ def create_app(config_name=os.getenv('DOCAPI_ENV', 'dev')):
 
     @app.after_request
     def add_header(response):
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
+
     return app

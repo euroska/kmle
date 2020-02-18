@@ -2,7 +2,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 DATABASE_DOCKER_NAME="docapi-postgres"
 TIKA_DOCKER_NAME="docapi-tika"
-BACKEND_DOCKER_NAME="euroska/test"
+BACKEND_DOCKER_NAME="docapi-backend"
 FRONTEND_DOCKER_NAME="docapi-frontend"
 NGINX_DOCKER_NAME="docapi-nginx"
 
@@ -11,6 +11,8 @@ DOCAPI_TEST_DB="postgres://postgres:password@$(DATABASE_DOCKER_NAME)/test"
 DOCAPI_PROD_DB="postgres://postgres:password@$(DATABASE_DOCKER_NAME)/postgres"
 DOCAPI_SECRET_KEY="123456"
 DOCAPI_TIKA_URL="http://$(TIKA_DOCKER_NAME)"
+
+.PHONY: kubernetes
 
 frontend_pull_image:
 	docker pull node:10
@@ -48,7 +50,10 @@ postgres_database_create: postgres_pull_image
 		psql -c "CREATE DATABASE dev; CREATE DATABASE test; CREATE DATABASE prod";
 
 backend_build_image:
-	docker build -t $(BACKEND_DOCKER_NAME) $(ROOT_DIR)/doc_api/
+	docker build -t euroska/test $(ROOT_DIR)/doc_api/
+
+backend_build_push: backend_build_image
+	docker push euroska/test
 
 backend_run_dev_image:
 	docker run -it --rm  --name $(BACKEND_DOCKER_NAME) -p 5000:5000 \
@@ -56,7 +61,7 @@ backend_run_dev_image:
 		--link $(TIKA_DOCKER_NAME):$(TIKA_DOCKER_NAME) \
 		-e DOCAPI_TIKA_URL=http://$(TIKA_DOCKER_NAME):9998 \
 		-e DOCAPI_DEV_DB=$(DOCAPI_DEV_DB)\
-		doc_api/backend /bin/bash -c \
+		euroska/test /bin/bash -c \
 		"python manage.py db upgrade head && python manage.py run"
 
 backend_run_test_image:
@@ -76,3 +81,11 @@ nginx_run: # nginx_pull_image
 	-v /tmp/client_body/:/var/lib/nginx/tmp/client_body/ \
 	-v /tmp:/var/log/nginx \
 	nginx
+
+kubernetes:
+	kubectl apply -f  kubernetes/docapi-postgres.yaml
+	kubectl apply -f  kubernetes/docapi-tika.yaml
+	kubectl apply -f  kubernetes/docapi-backend.yaml
+	kubectl apply -f  kubernetes/docapi-nginx.yaml
+
+all: frontend_build backend_build_push kubernetes

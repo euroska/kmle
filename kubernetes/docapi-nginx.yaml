@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+  name: docapi-nginx
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: docapi-nginx
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: docapi-nginx-claim0
+        - mountPath: /var/www
+          name: docapi-nginx-claim1
+      restartPolicy: Always
+      volumes:
+      - name: docapi-nginx-claim0
+        hostPath:
+          path: /home/euro/Projects/minolta/kmle/storage/nginx
+          type: Directory
+      - name: docapi-nginx-claim1
+        hostPath:
+          path: /home/euro/Projects/minolta/kmle/storage/frontend
+          type: Directory
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx
+  name: docapi-nginx
+spec:
+  ports:
+  - name: postgres
+    port: 80
+    targetPort: 80
+  selector:
+    app: nginx
+status:
+  loadBalancer: {}

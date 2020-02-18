@@ -77,10 +77,11 @@ def create_document_meta(document: Document):
     request = requests.put(
         f"{app.config['TIKA_SERVER']}/meta",
         data=document.data,
-        headers={"Accept": "application/json"}
+        headers={"Accept": "application/json"},
     )
     response_json = request.json()
 
+    # create document
     return DocumentMeta(
         uuid=document.uuid,
         time_of_creation=(
@@ -89,14 +90,13 @@ def create_document_meta(document: Document):
             else None
         ),
         creator=response_json.get("Author"),
-        word_count=response_json.get(
+        word_count=response_json.get(  # TODO: This section is not clean!!!
             "meta:word-count",
             len(
                 requests.put(
-                    f"{app.config['TIKA_SERVER']}/tika",
-                    data=document.data,
+                    f"{app.config['TIKA_SERVER']}/tika", data=document.data,
                 ).text.split()
-            )
+            ),
         ),
         language=response_json.get("language"),
     )

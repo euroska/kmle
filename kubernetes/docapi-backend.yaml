@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: backend
+  name: docapi-backend
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - env:
+        - name: DOCAPI_DEV_DB
+          value: postgres://postgres:password@docapi-postgres/postgres
+        - name: DOCAPI_TIKA_URL
+          value: http://docapi-tika:9998
+        image: euroska/test
+        name: docapi-backend
+        resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: backend
+  name: docapi-backend
+spec:
+  ports:
+  - name: backend
+    port: 5000
+    targetPort: 5000
+  selector:
+    app: backend
+status:
+  loadBalancer: {}
