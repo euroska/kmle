@@ -14,6 +14,8 @@ DOCAPI_TIKA_URL="http://$(TIKA_DOCKER_NAME)"
 
 .PHONY: kubernetes
 
+build: frontend_build backend_build_push kubernetes
+
 frontend_pull_image:
 	docker pull node:10
 
@@ -25,6 +27,7 @@ frontend_dev: frontend_install
 
 frontend_build: frontend_install
 	docker run -it --rm  --name $(FRONTEND_DOCKER_NAME) -v $(ROOT_DIR)/doc_frontend:/app -w /app node:10 npm run build
+	mkdir -p $(ROOT_DIR)/storage/frontend/
 	cp -a $(ROOT_DIR)/doc_frontend/public/* $(ROOT_DIR)/storage/frontend/
 
 tika_pull_image:
@@ -87,5 +90,3 @@ kubernetes:
 	kubectl apply -f  kubernetes/docapi-tika.yaml
 	kubectl apply -f  kubernetes/docapi-backend.yaml
 	kubectl apply -f  kubernetes/docapi-nginx.yaml
-
-all: frontend_build backend_build_push kubernetes

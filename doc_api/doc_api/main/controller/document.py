@@ -25,7 +25,10 @@ class DocumentList(Resource):
     def post(self):  # pylint: disable=no-self-use
         """ Creates a new Document """
         document = request.files["document"]
-        if document.filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSION"]:
+        if (
+            document.filename.rsplit(".", 1)[1].lower()
+            in app.config["ALLOWED_EXTENSION"]
+        ):
             return add_document(document.filename, document.stream.read())
 
         api.abort(406)
