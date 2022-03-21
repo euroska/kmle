@@ -17,6 +17,6 @@ setup(
         "SQLAlchemy==1.3.13",
         "psycopg2",
         "requests",
-        "waitress==1.4.3",
+        "waitress==2.1.1",
     ],
 )
